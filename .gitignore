@@ -7,6 +7,9 @@
 /.angular/
 .angular/
 
+# firebase specific
+/app/config/firebase.config.js
+
 # Node modules and dependency files
 /node_modules/
 /package-lock.json

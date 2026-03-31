@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="quantityApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quantity Measurement</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="./dist/output.css" />
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-[#e9e9ec] min-h-screen py-10 px-4">
+  <div class="max-w-[980px] mx-auto rounded-b-lg overflow-hidden shadow" ng-controller="QuantityController">
+    <div class="bg-[#f1f2f6] px-5 md:px-14 py-6 border-b border-[#dde1e8]">
+      <div ng-if="!isAuthenticated" class="grid md:grid-cols-[1fr,1fr,auto] gap-3 items-center">
+        <input
+          type="email"
+          ng-model="loginForm.email"
+          placeholder="Firebase Email"
+          class="h-[44px] w-full px-3 text-[14px] font-medium text-[#1f2532] bg-white border border-[#dde1e8] rounded-md focus:outline-none"
+        />
+        <input
+          type="password"
+          ng-model="loginForm.password"
+          placeholder="Password"
+          class="h-[44px] w-full px-3 text-[14px] font-medium text-[#1f2532] bg-white border border-[#dde1e8] rounded-md focus:outline-none"
+        />
+        <button
+          type="button"
+          ng-click="login()"
+          ng-disabled="authLoading"
+          class="h-[44px] px-5 rounded-md border border-[#1e8f84] bg-[#1e8f84] text-white text-sm font-semibold hover:bg-[#167a71] disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {{ authLoading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </div>
+
+      <div ng-if="!isAuthenticated" class="mt-3">
+        <button
+          type="button"
+          ng-click="loginWithGoogle()"
+          ng-disabled="authLoading"
+          class="h-[44px] px-5 rounded-md border border-[#cfd5e0] bg-white text-[#374151] text-sm font-semibold hover:bg-[#f8f9fc] disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          <i class="fa-brands fa-google mr-2"></i>
+          {{ authLoading ? 'Please wait...' : 'Continue with Google' }}
+        </button>
+      </div>
+
+      <div ng-if="isAuthenticated" class="flex flex-wrap items-center justify-between gap-3 text-sm text-[#334155]">
+        <div>
+          Signed in as <span class="font-semibold">{{ currentUserEmail }}</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <a href="./signup.html" class="text-[#1e8f84] font-semibold hover:underline">Create another account</a>
+          <button
+            type="button"
+            ng-click="logout()"
+            ng-disabled="authLoading"
+            class="h-[40px] px-4 rounded-md border border-[#cfd5e0] bg-white text-[#5b6372] text-sm font-semibold hover:bg-[#f8f9fc]"
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <div ng-if="authErrorMessage" class="mt-3 rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ authErrorMessage }}
+      </div>
+      <div ng-if="!isAuthenticated" class="mt-3 text-sm text-slate-600">
+        New user? <a href="./signup.html" class="font-semibold text-[#1e8f84] hover:underline">Create account</a>
+      </div>
+    </div>
+
+    <div ng-if="!isAuthenticated" class="bg-white px-5 md:px-14 py-8 text-slate-600">
+      Please sign in with Firebase to use quantity operations.
+    </div>
+
+    <div ng-if="isAuthenticated">
+    <div class="bg-gradient-to-r from-[#3d5ff1] to-[#5e79eb] py-5 px-6">
+      <h1 class="text-center text-white text-[40px] leading-none font-bold">Welcome To Quantity Measurement</h1>
+    </div>
+
+    <div class="bg-[#f1f2f6] px-5 md:px-14 py-8 md:py-10">
+      <form class="space-y-6">
+        <section>
+          <p class="text-[11px] font-bold tracking-[0.08em] text-slate-600 mb-3">CHOOSE TYPE</p>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+            <button
+              type="button"
+              ng-repeat="type in measurementTypes"
+              ng-click="form.measurementType = type; onMeasurementTypeChange()"
+              class="h-[115px] rounded-xl border bg-white flex flex-col items-center justify-center gap-3 transition"
+              ng-class="form.measurementType === type ? 'border-[#43d3cf] ring-1 ring-[#43d3cf]' : 'border-[#e2e5ec]'"
+            >
+              <i
+                class="text-3xl"
+                ng-class="{
+                  'fa-solid fa-ruler text-[#f5b73b]': type === 'Length',
+                  'fa-solid fa-scale-balanced text-[#f2b243]': type === 'Weight',
+                  'fa-solid fa-temperature-three-quarters text-[#ff5a3d]': type === 'Temperature',
+                  'fa-solid fa-glass-water text-[#62c7f0]': type === 'Volume'
+                }"
+              ></i>
+              <span class="text-[18px] font-semibold text-[#4e5565]">{{ type }}</span>
+            </button>
+          </div>
+        </section>
+
+        <section>
+          <p class="text-[11px] font-bold tracking-[0.08em] text-slate-600 mb-3">CHOOSE ACTION</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            <button
+              type="button"
+              ng-click="form.operation = 'compare'; onOperationChange()"
+              class="h-[44px] rounded-lg border text-[14px] font-semibold transition"
+              ng-class="form.operation === 'compare' ? 'bg-[#4662f2] border-[#4662f2] text-white shadow-sm' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Comparison
+            </button>
+            <button
+              type="button"
+              ng-click="form.operation = 'convert'; onOperationChange()"
+              class="h-[44px] rounded-lg border text-[14px] font-semibold transition"
+              ng-class="form.operation === 'convert' ? 'bg-[#4662f2] border-[#4662f2] text-white shadow-sm' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Conversion
+            </button>
+            <button
+              type="button"
+              ng-click="form.operation = 'add'; onOperationChange()"
+              class="h-[44px] rounded-lg border text-[14px] font-semibold transition"
+              ng-class="['add','addWithTarget','subtract','divide'].includes(form.operation) ? 'bg-[#4662f2] border-[#4662f2] text-white shadow-sm' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+              ng-disabled="form.measurementType === 'Temperature'"
+            >
+              Arithmetic
+            </button>
+          </div>
+
+          <div
+            class="grid grid-cols-2 md:grid-cols-4 gap-2 pt-3"
+            ng-if="['add','addWithTarget','subtract','divide'].includes(form.operation)"
+          >
+            <button
+              type="button"
+              ng-click="form.operation = 'add'; onOperationChange()"
+              class="h-[40px] rounded-lg border text-[13px] font-semibold"
+              ng-class="form.operation === 'add' ? 'bg-[#5f77f0] border-[#5f77f0] text-white' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Addition
+            </button>
+            <button
+              type="button"
+              ng-click="form.operation = 'addWithTarget'; onOperationChange()"
+              class="h-[40px] rounded-lg border text-[13px] font-semibold"
+              ng-class="form.operation === 'addWithTarget' ? 'bg-[#5f77f0] border-[#5f77f0] text-white' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Add Target
+            </button>
+            <button
+              type="button"
+              ng-click="form.operation = 'subtract'; onOperationChange()"
+              class="h-[40px] rounded-lg border text-[13px] font-semibold"
+              ng-class="form.operation === 'subtract' ? 'bg-[#5f77f0] border-[#5f77f0] text-white' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Subtraction
+            </button>
+            <button
+              type="button"
+              ng-click="form.operation = 'divide'; onOperationChange()"
+              class="h-[40px] rounded-lg border text-[13px] font-semibold"
+              ng-class="form.operation === 'divide' ? 'bg-[#5f77f0] border-[#5f77f0] text-white' : 'bg-white border-[#e2e5ec] text-[#6f7685]'"
+            >
+              Division
+            </button>
+          </div>
+        </section>
+
+        <section ng-if="form.operation" class="space-y-3">
+          <div class="grid grid-cols-2 gap-4">
+            <p class="text-[12px] font-bold text-slate-800">{{ form.operation === 'convert' ? 'FROM' : 'VALUE1' }}</p>
+            <p class="text-[12px] font-bold text-slate-800" ng-if="form.operation === 'convert' || requiresSecondQuantity()">
+              {{ form.operation === 'convert' ? 'TO' : 'VALUE2' }}
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="space-y-1">
+              <input
+                type="number"
+                ng-model="form.firstQuantity.value"
+                placeholder="1"
+                class="h-[68px] w-full px-4 text-[44px] font-semibold text-[#1f2532] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              />
+              <select
+                ng-model="form.firstQuantity.unit"
+                class="h-[48px] w-full px-3 text-[18px] font-semibold text-[#404756] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              >
+                <option value="">Select Unit</option>
+                <option ng-repeat="unit in availableUnits" value="{{unit}}">{{unit}}</option>
+              </select>
+            </div>
+
+            <div class="space-y-1" ng-if="form.operation === 'convert' || requiresSecondQuantity()">
+              <input
+                type="number"
+                ng-if="form.operation !== 'convert'"
+                ng-model="form.secondQuantity.value"
+                placeholder="1000"
+                class="h-[68px] w-full px-4 text-[44px] font-semibold text-[#1f2532] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              />
+              <input
+                type="number"
+                ng-if="form.operation === 'convert'"
+                ng-value="form.operation === 'convert' && result && isNumericResult() ? result.data : (form.operation === 'convert' && result && isObjectResult() ? result.data.value : form.secondQuantity.value)"
+                placeholder="1000"
+                class="h-[68px] w-full px-4 text-[44px] font-semibold text-[#1f2532] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              />
+              <select
+                ng-if="form.operation !== 'convert'"
+                ng-model="form.secondQuantity.unit"
+                class="h-[48px] w-full px-3 text-[18px] font-semibold text-[#404756] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              >
+                <option value="">Select Unit</option>
+                <option ng-repeat="unit in availableUnits" value="{{unit}}">{{unit}}</option>
+              </select>
+              <select
+                ng-if="form.operation === 'convert'"
+                ng-model="form.targetUnit"
+                class="h-[48px] w-full px-3 text-[18px] font-semibold text-[#404756] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+              >
+                <option value="">Select Target Unit</option>
+                <option ng-repeat="unit in availableUnits" value="{{unit}}">{{unit}}</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <section ng-if="requiresTargetUnit() && form.operation !== 'convert'" class="space-y-2">
+          <p class="text-[12px] font-bold text-slate-800">TO</p>
+          <select
+            ng-model="form.targetUnit"
+            class="h-[48px] w-full px-3 text-[18px] font-semibold text-[#404756] bg-white border border-[#dde1e8] rounded-none focus:outline-none"
+          >
+            <option value="">Select Target Unit</option>
+            <option ng-repeat="unit in availableUnits" value="{{unit}}">{{unit}}</option>
+          </select>
+        </section>
+
+        <div
+          ng-if="form.measurementType === 'Temperature' && form.operation && !isTemperatureOperationAllowed()"
+          class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-700"
+        >
+          Temperature supports only Comparison and Conversion.
+        </div>
+
+        <div ng-if="errorMessage" class="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+          {{ errorMessage }}
+        </div>
+
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button
+            type="button"
+            ng-click="calculate()"
+            ng-disabled="loading"
+            class="h-[44px] px-6 rounded-lg border border-[#4662f2] bg-[#4662f2] text-white text-sm font-semibold hover:bg-[#3954df] disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            {{ loading ? 'Calculating...' : 'Calculate' }}
+          </button>
+          <button
+            type="button"
+            ng-click="resetForm()"
+            class="h-[44px] px-6 rounded-lg border border-[#cfd5e0] bg-white text-[#5b6372] text-sm font-semibold hover:bg-[#f8f9fc]"
+          >
+            Reset
+          </button>
+        </div>
+
+        <section ng-if="result" class="pt-1">
+          <p class="text-[12px] font-bold text-slate-800 mb-2">RESULT</p>
+          <div class="text-[#3e4554] text-sm">
+            <div ng-if="isBooleanResult()">{{ result.data }}</div>
+            <div ng-if="isNumericResult()">{{ result.data }}</div>
+            <div ng-if="isObjectResult()" class="flex flex-wrap gap-x-4 gap-y-1">
+              <span>{{ result.data.value }}</span>
+              <span>{{ result.data.unit }}</span>
+              <span>{{ result.data.measurementType }}</span>
+            </div>
+          </div>
+        </section>
+      </form>
+    </div>
+    </div>
+  </div>
+
+  <script src="./app/app.module.js"></script>
+  <script src="./app/config/firebase.config.js"></script>
+  <script src="./app/services/auth.service.js"></script>
+  <script src="./app/services/auth.interceptor.js"></script>
+  <script src="./app/config/measurement.config.js"></script>
+  <script src="./app/services/quantity.service.js"></script>
+  <script src="./app/controllers/quantity.controller.js"></script>
+</body>
+</html>

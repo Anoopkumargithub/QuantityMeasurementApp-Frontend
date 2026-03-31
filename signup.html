@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="quantityApp">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up | Quantity Measurement</title>
+
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="./dist/output.css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-[#e9e9ec] min-h-screen py-8 px-4 md:py-12">
+  <div class="max-w-[520px] mx-auto rounded-xl overflow-hidden shadow" ng-controller="SignupController">
+    <div class="bg-gradient-to-r from-[#1e8f84] to-[#2ca79c] py-5 px-6">
+      <h1 class="text-center text-white text-[34px] leading-none font-bold">Create Account</h1>
+    </div>
+
+    <div class="bg-[#f1f2f6] px-5 md:px-8 py-7 space-y-5">
+      <p class="text-sm text-slate-600">
+        Sign up with Firebase email/password authentication.
+      </p>
+
+      <div class="space-y-3">
+        <input
+          type="email"
+          ng-model="form.email"
+          placeholder="Email"
+          class="h-[46px] w-full px-3 text-[14px] font-medium text-[#1f2532] bg-white border border-[#dde1e8] rounded-md focus:outline-none"
+        />
+        <input
+          type="password"
+          ng-model="form.password"
+          placeholder="Password"
+          class="h-[46px] w-full px-3 text-[14px] font-medium text-[#1f2532] bg-white border border-[#dde1e8] rounded-md focus:outline-none"
+        />
+        <input
+          type="password"
+          ng-model="form.confirmPassword"
+          placeholder="Confirm Password"
+          class="h-[46px] w-full px-3 text-[14px] font-medium text-[#1f2532] bg-white border border-[#dde1e8] rounded-md focus:outline-none"
+        />
+      </div>
+
+      <button
+        type="button"
+        ng-click="createAccount()"
+        ng-disabled="loading"
+        class="h-[46px] w-full rounded-md border border-[#1e8f84] bg-[#1e8f84] text-white text-sm font-semibold hover:bg-[#167a71] disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        {{ loading ? 'Creating account...' : 'Create Account' }}
+      </button>
+
+      <button
+        type="button"
+        ng-click="continueWithGoogle()"
+        ng-disabled="loading"
+        class="h-[46px] w-full rounded-md border border-[#cfd5e0] bg-white text-[#374151] text-sm font-semibold hover:bg-[#f8f9fc] disabled:opacity-60 disabled:cursor-not-allowed"
+      >
+        <i class="fa-brands fa-google mr-2"></i>
+        {{ loading ? 'Please wait...' : 'Continue with Google' }}
+      </button>
+
+      <p ng-if="errorMessage" class="rounded-lg border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700">
+        {{ errorMessage }}
+      </p>
+
+      <p ng-if="successMessage" class="rounded-lg border border-emerald-300 bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+        {{ successMessage }}
+      </p>
+
+      <div class="pt-1 text-sm text-slate-600">
+        Already have an account?
+        <a href="./index.html" class="font-semibold text-[#1e8f84] hover:underline">Back to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="./app/app.module.js"></script>
+  <script src="./app/config/firebase.config.js"></script>
+  <script src="./app/services/auth.service.js"></script>
+  <script src="./app/services/auth.interceptor.js"></script>
+  <script src="./app/controllers/signup.controller.js"></script>
+</body>
+</html>
