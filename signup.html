@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign Up | Quantity Measurement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <main class="auth-layout">
+      <section class="auth-card">
+        <h1>Sign Up</h1>
+
+        <form id="signUpForm" class="auth-form" novalidate>
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" required />
+
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" required minlength="6" />
+
+          <label for="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            minlength="6"
+          />
+
+          <button class="btn btn-primary" type="submit">Create Account</button>
+          <p id="authStatus" class="status"></p>
+        </form>
+
+        <p class="auth-link-text">
+          Already have an account?
+          <a href="./signin.html">Sign in here</a>
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="./js/signup.js"></script>
+  </body>
+</html>

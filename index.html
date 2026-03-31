@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quantity Measurement</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="top-banner">
+        <h1>Welcome To Quantity Measurement</h1>
+        <div class="user-meta">
+          <p id="userEmail">Authenticated User</p>
+          <button id="logoutButton" class="btn btn-ghost">Sign Out</button>
+        </div>
+      </header>
+
+      <section class="card-grid">
+        <section class="panel panel-type">
+          <h2>Choose Type</h2>
+          <div class="type-grid">
+            <button class="type-card is-active" data-type="Length">
+              <span class="icon">📏</span>
+              <span>Length</span>
+            </button>
+            <button class="type-card" data-type="Weight">
+              <span class="icon">⚖️</span>
+              <span>Weight</span>
+            </button>
+            <button class="type-card" data-type="Temperature">
+              <span class="icon">🌡️</span>
+              <span>Temperature</span>
+            </button>
+            <button class="type-card" data-type="Volume">
+              <span class="icon">🧪</span>
+              <span>Volume</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel panel-action">
+          <h2>Choose Action</h2>
+          <div class="action-row">
+            <button class="btn btn-action is-active" data-action="comparison">Comparison</button>
+            <button class="btn btn-action" data-action="conversion">Conversion</button>
+            <button class="btn btn-action" data-action="arithmetic">Arithmetic</button>
+          </div>
+
+          <div class="field-row is-hidden" id="arithmeticOptions">
+            <label for="arithmeticOperation">Arithmetic Operation</label>
+            <select id="arithmeticOperation">
+              <option value="add">Add</option>
+              <option value="subtract">Subtract</option>
+              <option value="divide">Divide</option>
+            </select>
+          </div>
+        </section>
+
+        <section class="panel panel-inputs">
+          <div class="input-grid">
+            <article class="input-card">
+              <h3>From</h3>
+              <input id="firstValue" type="number" value="1" step="any" />
+              <select id="firstUnit"></select>
+            </article>
+
+            <article class="input-card" id="secondInputCard">
+              <h3>To</h3>
+              <input id="secondValue" type="number" value="1000" step="any" />
+              <select id="secondUnit"></select>
+            </article>
+          </div>
+
+          <div class="cta-row">
+            <button id="runActionButton" class="btn btn-primary">Run Operation</button>
+          </div>
+
+          <p id="statusText" class="status status-success">Loading...</p>
+
+          <section id="resultBlock" class="result-block is-hidden" aria-live="polite">
+            <h3>Result</h3>
+            <p id="resultText"></p>
+          </section>
+        </section>
+      </section>
+    </main>
+
+    <script type="module" src="./js/app.js"></script>
+  </body>
+</html>
