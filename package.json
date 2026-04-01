@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.html",
   "scripts": {
-    "dev": "npx @tailwindcss/cli -i ./styles/input.css -o ./dist/output.css --watch",
-    "serve": "live-server",
+    "generate:config": "node ./scripts/generate-runtime-config.cjs",
+    "dev": "npm run generate:config && npx @tailwindcss/cli -i ./styles/input.css -o ./dist/output.css --watch",
+    "serve": "npm run generate:config && live-server",
+    "build": "npm run generate:config && npx @tailwindcss/cli -i ./styles/input.css -o ./dist/output.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -14,6 +16,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@tailwindcss/cli": "^4.2.1",
+    "dotenv": "^16.4.7",
     "tailwindcss": "^4.2.1"
   },
   "dependencies": {

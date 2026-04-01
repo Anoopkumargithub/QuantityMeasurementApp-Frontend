@@ -8,7 +8,7 @@ app.service("AuthService", function ($q, FIREBASE_CONFIG) {
   }
 
   if (!validateFirebaseConfig(FIREBASE_CONFIG)) {
-    throw new Error("Firebase is not configured. Update app/config/firebase.config.js with your project values.");
+    throw new Error("Firebase is not configured. Set the FIREBASE_* environment variables and rebuild.");
   }
 
   if (!firebase.apps || !firebase.apps.length) {

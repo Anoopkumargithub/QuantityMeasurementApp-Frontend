@@ -72,6 +72,20 @@ npm run serve
 
 The application will open in your browser at `http://127.0.0.1:8080`
 
+## Environment Variables
+
+Create a local `.env` file in the repository root and set these values:
+
+```bash
+FIREBASE_API_KEY=your_firebase_api_key
+FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+FIREBASE_PROJECT_ID=your_project_id
+FIREBASE_APP_ID=your_app_id
+API_BASE_URL=http://localhost:5044/api/QuantityMeasurement
+```
+
+Render uses the same variable names in the service settings, so you do not need to commit secrets to the repo.
+
 ## Project Structure
 
 ```
@@ -114,9 +128,27 @@ The application communicates with a backend API running on `http://localhost:504
 
 ## Development Notes
 
-- Ensure the backend API is running on port 5044 before starting the frontend
+- Ensure the backend API is running on port 5044 before starting the frontend, or set `API_BASE_URL` to your deployed API URL
 - The auth interceptor automatically adds authentication tokens to API requests
-- Tailwind CSS is built to `dist/output.css` with the `dev` script
+- Tailwind CSS is built to `dist/output.css` with the `dev` or `build` script
+
+## Render Deployment
+
+Use Render as a Static Site.
+
+- Root Directory: leave blank, or set it to `.`
+- Build Command: `npm run build`
+- Publish Directory: `.`
+
+Add these environment variables in Render:
+
+- `FIREBASE_API_KEY`
+- `FIREBASE_AUTH_DOMAIN`
+- `FIREBASE_PROJECT_ID`
+- `FIREBASE_APP_ID`
+- `API_BASE_URL`
+
+If your backend is also deployed on Render, set `API_BASE_URL` to the deployed API endpoint, for example `https://your-api.onrender.com/api/QuantityMeasurement`.
 
 ## License
 

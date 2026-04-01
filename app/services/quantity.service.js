@@ -1,5 +1,5 @@
-app.service("QuantityService", function ($http) {
-  var BASE_URL = "http://localhost:5044/api/QuantityMeasurement";
+app.service("QuantityService", function ($http, API_BASE_URL) {
+  var BASE_URL = API_BASE_URL || "http://localhost:5044/api/QuantityMeasurement";
 
   this.compare = function (payload) {
     return $http.post(BASE_URL + "/compare", payload);
