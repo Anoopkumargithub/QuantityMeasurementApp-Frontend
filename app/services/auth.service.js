@@ -31,7 +31,16 @@ app.service("AuthService", function ($q, FIREBASE_CONFIG) {
       prompt: "select_account"
     });
 
-    return $q.when(auth.signInWithPopup(provider));
+    return $q.when(auth.signInWithPopup(provider)).catch(function (error) {
+      var code = error && error.code ? error.code : "";
+      var shouldFallbackToRedirect = code === "auth/popup-blocked" || code === "auth/operation-not-supported-in-this-environment";
+
+      if (!shouldFallbackToRedirect) {
+        return $q.reject(error);
+      }
+
+      return $q.when(auth.signInWithRedirect(provider));
+    });
   };
 
   this.linkGoogleProvider = function () {

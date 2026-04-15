@@ -24,7 +24,22 @@ if (missingFirebaseKeys.length > 0) {
   );
 }
 
-const apiBaseUrl = process.env.API_BASE_URL || "http://localhost:5044/api/QuantityMeasurement";
+const rawApiBaseUrl = process.env.API_BASE_URL || "http://localhost:5044/api/QuantityMeasurement";
+
+function normalizeApiBaseUrl(url) {
+  const trimmed = String(url).replace(/\/+$/, "");
+  if (/\/api\/QuantityMeasurement$/i.test(trimmed)) {
+    return trimmed;
+  }
+
+  return trimmed + "/api/QuantityMeasurement";
+}
+
+const apiBaseUrl = normalizeApiBaseUrl(rawApiBaseUrl);
+
+if (process.env.NODE_ENV === "production" && /localhost|127\.0\.0\.1/i.test(apiBaseUrl)) {
+  throw new Error("API_BASE_URL points to localhost in production. Set API_BASE_URL to your deployed backend URL.");
+}
 
 const content = `app.constant("FIREBASE_CONFIG", ${JSON.stringify(firebaseConfig, null, 2)});
 app.constant("API_BASE_URL", ${JSON.stringify(apiBaseUrl)});

@@ -1,5 +1,16 @@
 app.service("QuantityService", function ($http, API_BASE_URL) {
-  var BASE_URL = API_BASE_URL || "http://localhost:5044/api/QuantityMeasurement";
+  function normalizeBaseUrl(url) {
+    var fallback = "http://localhost:5044/api/QuantityMeasurement";
+    var value = (url || fallback).replace(/\/+$/, "");
+
+    if (!/\/api\/QuantityMeasurement$/i.test(value)) {
+      value += "/api/QuantityMeasurement";
+    }
+
+    return value;
+  }
+
+  var BASE_URL = normalizeBaseUrl(API_BASE_URL);
 
   this.compare = function (payload) {
     return $http.post(BASE_URL + "/compare", payload);
